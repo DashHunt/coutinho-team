@@ -1,0 +1,148 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider            = "prisma-client"
+  output              = "../generated/prisma"
+  importFileExtension = "ts"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ===================== ENUMS ===================== //
+
+enum LeadStatus {
+  CRIADO
+  INATIVO
+  EM_ANDAMENTO
+  CONCLUIDO
+}
+
+enum PlanStatus {
+  ATIVO
+  INATIVO
+  EM_RENOVACAO
+}
+
+enum EventLevel {
+  ESTADUAL
+  NACIONAL
+  INTERNACIONAL
+}
+
+enum EventAchievement {
+  OURO
+  PRATA
+  BRONZE
+  RECORDE
+  PARTICIPACAO
+}
+
+// ===================== USERS =====================
+
+model Users {
+  id               Int       @id @default(autoincrement())
+  name             String
+  email            String    @unique
+  password         String
+  created_date     DateTime  @default(now())
+  deleted_date     DateTime?
+  modificated_date DateTime  @updatedAt
+}
+
+// ===================== LEADS =====================
+
+model Lead {
+  id               Int        @id @default(autoincrement())
+  name             String
+  email            String     @unique
+  telephone_number String
+  history          String?
+  selected_plan    String?
+  status           LeadStatus @default(CRIADO)
+  created_date     DateTime   @default(now())
+  deleted_date     DateTime?
+  modificated_date DateTime   @updatedAt
+}
+
+// ===================== PLANS =====================
+
+model Plans {
+  id                  Int                 @id @default(autoincrement())
+  name                String
+  mode                String
+  duration            Int
+  monthly_value       Int
+  total_value         Int
+  status              String
+  created_date        DateTime            @default(now())
+  deleted_date        DateTime?
+  modificated_date    DateTime            @updatedAt
+  clientPlanHistories ClientPlanHistory[]
+}
+
+// ===================== CLIENTS =====================
+
+model Client {
+  id                  Int                  @id @default(autoincrement())
+  name                String
+  email               String               @unique
+  birth_date          DateTime
+  gender              String
+  telephone_number    String
+  document            String?
+  objectives          String?
+  history             String?
+  created_date        DateTime             @default(now())
+  deleted_date        DateTime?
+  modificated_date    DateTime             @updatedAt
+  clientInfos         ClientInfo[]
+  clientAchiviments   ClientAchievements[]
+  clientPlanHistories ClientPlanHistory[]
+}
+
+model ClientPlanHistory {
+  id               Int        @id @default(autoincrement())
+  Client           Client     @relation(fields: [client_id], references: [id])
+  client_id        Int
+  Plan             Plans      @relation(fields: [plan_id], references: [id])
+  plan_id          Int
+  purchased_date   DateTime
+  expiration_date  DateTime // calculado: purchased_date + Plan.duration
+  status           PlanStatus @default(ATIVO)
+  created_date     DateTime   @default(now())
+  modificated_date DateTime   @updatedAt
+}
+
+model ClientInfo {
+  id               Int       @id @default(autoincrement())
+  Client           Client    @relation(fields: [client_id], references: [id])
+  client_id        Int
+  block            String
+  block_week       String
+  previous_block   String?   @default("No block registered")
+  notes            String?
+  sheet_link       String
+  created_date     DateTime  @default(now())
+  deleted_date     DateTime?
+  modificated_date DateTime  @updatedAt
+}
+
+model ClientAchievements {
+  id                Int              @id @default(autoincrement())
+  Client            Client           @relation(fields: [client_id], references: [id])
+  client_id         Int
+  event             String
+  event_level       EventLevel
+  event_achievement EventAchievement
+  event_date        DateTime
+  created_date      DateTime         @default(now())
+  deleted_date      DateTime?
+  modificated_date  DateTime         @updatedAt
+}

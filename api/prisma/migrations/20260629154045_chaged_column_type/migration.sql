@@ -1,0 +1,12 @@
+/*
+  Warnings:
+
+  - The `status` column on the `Lead` table would be dropped and recreated. This will lead to data loss if there is data in the column.
+
+*/
+-- CreateEnum
+CREATE TYPE "LeadStatus" AS ENUM ('CRIADO', 'INATIVO', 'EM_ANDAMENTO');
+
+-- AlterTable
+ALTER TABLE "Lead" DROP COLUMN "status",
+ADD COLUMN     "status" "LeadStatus" NOT NULL DEFAULT 'CRIADO';
