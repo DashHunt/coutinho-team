@@ -1,12 +1,11 @@
-import { Card } from './ui/Card';
-import skullThinking from '../assets/skull-thinking.png';
-
-const STATS = [
-  { value: '+00', label: 'Medalhas nacionais' },
-  { value: '+00', label: 'Medalhas estaduais' },
-] as const;
+import { Card } from "./ui/Card";
+import skullThinking from "../assets/skull-thinking.png";
+import { useGetNationalMedals, useGetStateMedals } from "../queries/ClientQueries";
 
 export default function Sobre() {
+  const { data: nationalMedals, isLoading: loadingNational } = useGetNationalMedals();
+  const { data: stateMedals, isLoading: loadingState } = useGetStateMedals();
+
   return (
     <section id="sobre" className="py-[90px]">
       <div className="max-w-[1180px] mx-auto px-6 grid grid-cols-1 md:grid-cols-2 gap-[60px] items-center">
@@ -18,26 +17,53 @@ export default function Sobre() {
             A filosofia do Coutinho Team
           </h2>
           <p className="text-[16px] text-cream/80 max-w-[560px] mb-[18px]">
-            O <strong className="text-cream">Coutinho Team Powerlifting</strong> nasceu da experiência de
-            competir, errar, ajustar e evoluir — dentro e fora da plataforma. Trabalhamos com{' '}
-            <strong className="text-cream">treinamento de força e Powerlifting</strong> para atletas de
-            competição e para quem busca o esporte como estilo de vida, sempre com técnica sólida,
-            progressão inteligente e acompanhamento de verdade.
+            O <strong className="text-cream">Coutinho Team Powerlifting</strong> nasceu da
+            experiência de competir, errar, ajustar e evoluir — dentro e fora da plataforma.
+            Trabalhamos com{" "}
+            <strong className="text-cream">treinamento de força e Powerlifting</strong> para atletas
+            de competição e para quem busca o esporte como estilo de vida, sempre com técnica
+            sólida, progressão inteligente e acompanhamento de verdade.
           </p>
           <p className="text-[16px] text-cream/80 max-w-[560px] mb-9">
             Acreditamos que força se constrói com consistência, não com atalhos. Por isso cada aluno
-            recebe um plano de treino pensado pra sua realidade, com ajustes constantes baseados em como
-            o corpo responde.
+            recebe um plano de treino pensado pra sua realidade, com ajustes constantes baseados em
+            como o corpo responde.
           </p>
 
-          <div className="flex gap-4 mt-9">
-            {STATS.map((s) => (
-              <Card key={s.label} variant="elevated" padding="sm" rounded="md" className="transition-transform duration-300 hover:scale-110 min-w-[120px]">
-                <span className="block font-display font-extrabold text-[30px] text-ember leading-none">{s.value}</span>
-                <span className="block text-[12px] text-cream/65 uppercase tracking-[0.4px] mt-1.5">{s.label}</span>
+          {loadingNational || loadingState ? (
+            <div>Loading...</div>
+          ) : (
+            <div className="flex gap-4 mt-9">
+              <Card
+                key={0}
+                variant="elevated"
+                padding="sm"
+                rounded="md"
+                className="transition-transform duration-300 hover:scale-110 min-w-[120px]"
+              >
+                <span className="block font-display font-extrabold text-[30px] text-ember leading-none">
+                  +{nationalMedals.total}
+                </span>
+                <span className="block text-[12px] text-cream/65 uppercase tracking-[0.4px] mt-1.5">
+                  Medalhas nacionais
+                </span>
               </Card>
-            ))}
-          </div>
+              <Card
+                key={1}
+                variant="elevated"
+                padding="sm"
+                rounded="md"
+                className="transition-transform duration-300 hover:scale-110 min-w-[120px]"
+              >
+                <span className="block font-display font-extrabold text-[30px] text-ember leading-none">
+                  +{stateMedals.total}
+                </span>
+                <span className="block text-[12px] text-cream/65 uppercase tracking-[0.4px] mt-1.5">
+                  Medalhas estaduais
+                </span>
+              </Card>
+            </div>
+          )}
         </div>
 
         <div className="flex justify-center">

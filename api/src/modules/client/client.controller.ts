@@ -13,6 +13,10 @@ import {
   getPlanHistory,
   addPlanToClient,
   updatePlanHistoryStatus,
+  countAthletes,
+  countMedals,
+  countMedalsByLevel,
+  getTop3ByMedals,
 } from "./client.model";
 
 type ClientByIdParams = { Params: { id: number } };
@@ -242,5 +246,30 @@ export class ClientController {
     const { status } = request.body;
     const updated = await updatePlanHistoryStatus(historyId, status);
     reply.send(updated);
+  }
+
+  // Stats
+  public static async getAthletesCount(_request: FastifyRequest, reply: FastifyReply): Promise<void> {
+    const total = await countAthletes();
+    reply.send({ total });
+  }
+
+  public static async getMedalsTotal(_request: FastifyRequest, reply: FastifyReply): Promise<void> {
+    const total = await countMedals();
+    reply.send({ total });
+  }
+
+  public static async getMedalsEstadual(_request: FastifyRequest, reply: FastifyReply): Promise<void> {
+    const total = await countMedalsByLevel("ESTADUAL");
+    reply.send({ total });
+  }
+
+  public static async getMedalsNacional(_request: FastifyRequest, reply: FastifyReply): Promise<void> {
+    const total = await countMedalsByLevel("NACIONAL");
+    reply.send({ total });
+  }
+
+  public static async getTop3Medalists(_request: FastifyRequest, reply: FastifyReply): Promise<void> {
+    reply.send(await getTop3ByMedals());
   }
 }

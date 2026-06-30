@@ -44,6 +44,12 @@ enum EventAchievement {
   PARTICIPACAO
 }
 
+enum FeedbackOptions {
+  PROMOTOR
+  PASSIVO
+  DETRATOR
+}
+
 // ===================== USERS =====================
 
 model Users {
@@ -102,9 +108,10 @@ model Client {
   created_date        DateTime             @default(now())
   deleted_date        DateTime?
   modificated_date    DateTime             @updatedAt
-  clientInfos         ClientInfo[]
+  clientInfo          ClientInfo?
   clientAchiviments   ClientAchievements[]
   clientPlanHistories ClientPlanHistory[]
+  clientFeedbacks     ClientFeedback[]
 }
 
 model ClientPlanHistory {
@@ -123,7 +130,7 @@ model ClientPlanHistory {
 model ClientInfo {
   id               Int       @id @default(autoincrement())
   Client           Client    @relation(fields: [client_id], references: [id])
-  client_id        Int
+  client_id        Int       @unique
   block            String
   block_week       String
   previous_block   String?   @default("No block registered")
@@ -145,4 +152,15 @@ model ClientAchievements {
   created_date      DateTime         @default(now())
   deleted_date      DateTime?
   modificated_date  DateTime         @updatedAt
+}
+
+model ClientFeedback {
+  id               Int             @id @default(autoincrement())
+  Client           Client          @relation(fields: [client_id], references: [id])
+  client_id        Int
+  feedback         String
+  feedback_nps     FeedbackOptions
+  created_date     DateTime        @default(now())
+  deleted_date     DateTime?
+  modificated_date DateTime        @updatedAt
 }

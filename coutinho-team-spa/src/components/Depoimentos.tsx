@@ -1,37 +1,23 @@
-import { Card } from './ui/Card';
+import { Loader } from "lucide-react";
+import { useGetFeedbacks } from "../queries/ClientQueries";
+import { Card } from "./ui/Card";
 
 interface Testimonial {
-  initial: string;
-  name: string;
-  tag: string;
-  quote: string;
+  id: number;
+  client_id: number;
+  feedback: string;
+  feedback_nps: "PROMOTOR" | "PASSIVO" | "DETRATOR";
+  created_date: Date;
+  deleted_date: Date | null;
+  modificated_date: Date;
+  Client: {
+    name: string;
+  };
 }
 
-const TESTIMONIALS: Testimonial[] = [
-  {
-    initial: 'A',
-    name: 'Nome do Aluno',
-    tag: 'Categoria / Perfil',
-    quote:
-      'Espaço reservado para o depoimento real deste aluno sobre a experiência treinando com o Coutinho Team.',
-  },
-  {
-    initial: 'A',
-    name: 'Nome do Aluno',
-    tag: 'Categoria / Perfil',
-    quote:
-      'Espaço reservado para o depoimento real deste aluno sobre a experiência treinando com o Coutinho Team.',
-  },
-  {
-    initial: 'A',
-    name: 'Nome do Aluno',
-    tag: 'Categoria / Perfil',
-    quote:
-      'Espaço reservado para o depoimento real deste aluno sobre a experiência treinando com o Coutinho Team.',
-  },
-];
-
 export default function Depoimentos() {
+  const { data, isLoading, isError, error } = useGetFeedbacks();
+
   return (
     <section id="depoimentos" className="py-[90px]">
       <div className="max-w-[1180px] mx-auto px-6">
@@ -44,20 +30,40 @@ export default function Depoimentos() {
           </h2>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-[22px]">
-          {TESTIMONIALS.map((t, index) => (
-            <Card key={index} variant="elevated" hover="scale" padding="md" rounded="lg">
-              <div className="w-12 h-12 rounded-full bg-ember-deep text-bone flex items-center justify-center font-display text-xl mb-3.5">
-                {t.initial}
-              </div>
-              <h4 className="text-[15px] font-extrabold font-body normal-case tracking-normal mb-0.5">
-                {t.name}
-              </h4>
-              <span className="text-[12px] text-ember font-bold">{t.tag}</span>
-              <p className="text-[14px] text-cream/75 mt-3.5 italic">{t.quote}</p>
-            </Card>
-          ))}
-        </div>
+        {isLoading && (
+          <div className="flex justify-center py-10">
+            <Loader className="animate-spin text-ember" />
+          </div>
+        )}
+
+        {isError && (
+          <div className="text-center text-cream/50 py-6">
+            Erro ao carregar depoimentos: {error.message}
+          </div>
+        )}
+
+        {!isLoading && !isError && !data?.length && (
+          <div className="text-center text-cream/40">
+            Nenhum depoimento disponível no momento.
+          </div>
+        )}
+
+        {!isLoading && !isError && !!data?.length && (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-[22px]">
+            {data?.map((feedback: Testimonial) => (
+              <Card key={feedback.id} variant="elevated" hover="scale" padding="md" rounded="lg">
+                <div className="w-12 h-12 rounded-full bg-ember-deep text-bone flex items-center justify-center font-display text-xl mb-3.5">
+                  {feedback.Client.name[2].toUpperCase()}
+                </div>
+                <h4 className="text-[15px] font-extrabold font-body normal-case tracking-normal mb-0.5">
+                  {feedback.Client.name}
+                </h4>
+                <span className="text-[12px] text-ember font-bold">{feedback.feedback_nps}</span>
+                <p className="text-[14px] text-cream/75 mt-3.5 italic">"{feedback.feedback}"</p>
+              </Card>
+            ))}
+          </div>
+        )}
       </div>
     </section>
   );

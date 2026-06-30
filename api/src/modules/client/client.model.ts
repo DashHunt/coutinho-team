@@ -6,11 +6,12 @@ export const getClients = async () => {
   return await prisma.client.findMany({
     where: { deleted_date: null },
     include: {
-      clientInfos: { where: { deleted_date: null } },
+      clientInfo: true,
       clientPlanHistories: {
         where: { status: "ATIVO" },
       },
       clientAchiviments: { where: { deleted_date: null } },
+      clientFeedbacks: { where: { deleted_date: null } },
     },
   });
 };
@@ -19,9 +20,10 @@ export const getClientById = async (id: number) => {
   return await prisma.client.findUnique({
     where: { id },
     include: {
-      clientInfos: { where: { deleted_date: null } },
+      clientInfo: true,
       clientPlanHistories: { include: { Plan: true } },
       clientAchiviments: { where: { deleted_date: null } },
+      clientFeedbacks: { where: { deleted_date: null } },
     },
   });
 };
@@ -136,9 +138,8 @@ export const softDeleteClient = async (id: number) => {
 // ===================== CLIENT INFO =====================
 
 export const getClientInfo = async (clientId: number) => {
-  return await prisma.clientInfo.findFirst({
-    where: { client_id: clientId, deleted_date: null },
-    orderBy: { created_date: "desc" },
+  return await prisma.clientInfo.findUnique({
+    where: { client_id: clientId },
   });
 };
 
@@ -152,15 +153,11 @@ export const updateClientInfo = async (
     sheet_link: string;
   },
 ) => {
-  const info = await prisma.clientInfo.findFirst({
-    where: { client_id: clientId, deleted_date: null },
-    orderBy: { created_date: "desc" },
-  });
-
+  const info = await prisma.clientInfo.findUnique({ where: { client_id: clientId } });
   if (!info) throw new Error("ClientInfo not found");
 
   return await prisma.clientInfo.update({
-    where: { id: info.id },
+    where: { client_id: clientId },
     data,
   });
 };
@@ -240,4 +237,54 @@ export const updatePlanHistoryStatus = async (
     where: { id: historyId },
     data: { status },
   });
+};
+
+// ===================== STATS =====================
+
+export const countAthletes = async () => {
+  return await prisma.client.count({ where: { deleted_date: null } });
+};
+
+export const countMedals = async () => {
+  return await prisma.clientAchievements.count({ where: { deleted_date: null } });
+};
+
+export const countMedalsByLevel = async (
+  level: "ESTADUAL" | "NACIONAL" | "INTERNACIONAL",
+) => {
+  return await prisma.clientAchievements.count({
+    where: { deleted_date: null, event_level: level },
+  });
+};
+
+export const getTop3ByMedals = async () => {
+  const ranking = await prisma.clientAchievements.groupBy({
+    by: ["client_id"],
+    where: { deleted_date: null },
+    _count: { id: true },
+    orderBy: { _count: { id: "desc" } },
+    take: 3,
+  });
+
+  if (ranking.length === 0) return [];
+
+  const clientIds = ranking.map((r) => r.client_id);
+
+  const clients = await prisma.client.findMany({
+    where: { id: { in: clientIds } },
+    include: {
+      clientInfo: true,
+      clientPlanHistories: { include: { Plan: true } },
+      clientAchiviments: { where: { deleted_date: null } },
+      clientFeedbacks: { where: { deleted_date: null } },
+    },
+  });
+
+  return clientIds
+    .map((id) => {
+      const client = clients.find((c) => c.id === id);
+      const medalCount = ranking.find((r) => r.client_id === id)?._count.id ?? 0;
+      return client ? { ...client, medal_count: medalCount } : null;
+    })
+    .filter(Boolean);
 };

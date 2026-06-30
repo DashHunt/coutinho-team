@@ -16,6 +16,8 @@ import {
   clientInfoResponseSchema,
   achievementResponseSchema,
   planHistoryResponseSchema,
+  countResponseSchema,
+  topMedalistResponseSchema,
   notFoundSchema,
   createdClientSchema,
   deletedClientSchema,
@@ -25,6 +27,78 @@ import {
 } from "./client.schema";
 
 export default async function clientRoutes(server: FastifyTypedInstance) {
+  // ===================== STATS (registrar antes das rotas com :id) =====================
+
+  server.get(
+    "/clients/count",
+    {
+      schema: {
+        tags: ["Client - Stats"],
+        description: "Count total registered athletes",
+        response: {
+          200: countResponseSchema,
+        },
+      },
+    },
+    ClientController.getAthletesCount,
+  );
+
+  server.get(
+    "/clients/top-medals",
+    {
+      schema: {
+        tags: ["Client - Stats"],
+        description: "Top 3 athletes by total medal count, with full client data",
+        response: {
+          200: z.array(topMedalistResponseSchema),
+        },
+      },
+    },
+    ClientController.getTop3Medalists,
+  );
+
+  server.get(
+    "/clients/medals/total",
+    {
+      schema: {
+        tags: ["Client - Stats"],
+        description: "Total medals count across all athletes",
+        response: {
+          200: countResponseSchema,
+        },
+      },
+    },
+    ClientController.getMedalsTotal,
+  );
+
+  server.get(
+    "/clients/medals/estadual",
+    {
+      schema: {
+        tags: ["Client - Stats"],
+        description: "Total ESTADUAL medals count",
+        response: {
+          200: countResponseSchema,
+        },
+      },
+    },
+    ClientController.getMedalsEstadual,
+  );
+
+  server.get(
+    "/clients/medals/nacional",
+    {
+      schema: {
+        tags: ["Client - Stats"],
+        description: "Total NACIONAL medals count",
+        response: {
+          200: countResponseSchema,
+        },
+      },
+    },
+    ClientController.getMedalsNacional,
+  );
+
   // ===================== CLIENT CRUD =====================
 
   server.get(
@@ -65,7 +139,8 @@ export default async function clientRoutes(server: FastifyTypedInstance) {
       preHandler: authenticate,
       schema: {
         tags: ["Client"],
-        description: "Create a new client from lead. Creates client, plan history and client info in a single transaction.",
+        description:
+          "Create a new client from lead. Creates client, plan history and client info in a single transaction.",
         body: createClientSchema,
         response: {
           201: createdClientSchema.describe("Client created successfully"),

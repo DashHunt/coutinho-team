@@ -10,7 +10,7 @@ export default async function leadRoutes(server: FastifyTypedInstance) {
   server.get(
     "/leads",
     {
-      preHandler: authenticate,
+      // preHandler: authenticate,
       schema: {
         tags: ["Lead"],
         description: "List leads",

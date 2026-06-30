@@ -106,6 +106,16 @@ export const planHistoryResponseSchema = z.object({
   modificated_date: z.date().nullable(),
 });
 
+export const feedbackInClientResponseSchema = z.object({
+  id: z.number(),
+  client_id: z.number(),
+  feedback: z.string(),
+  feedback_nps: z.string(),
+  created_date: z.date().nullable(),
+  deleted_date: z.date().nullable(),
+  modificated_date: z.date().nullable(),
+});
+
 export const clientResponseSchema = z.object({
   id: z.number(),
   name: z.string(),
@@ -119,9 +129,32 @@ export const clientResponseSchema = z.object({
   created_date: z.date().nullable(),
   deleted_date: z.date().nullable(),
   modificated_date: z.date().nullable(),
-  clientInfos: z.array(clientInfoResponseSchema),
+  clientInfo: clientInfoResponseSchema.nullable(),
   clientPlanHistories: z.array(planHistoryResponseSchema),
   clientAchiviments: z.array(achievementResponseSchema),
+  clientFeedbacks: z.array(feedbackInClientResponseSchema),
+});
+
+export const countResponseSchema = z.object({ total: z.number() });
+
+export const topMedalistResponseSchema = z.object({
+  medal_count: z.number(),
+  id: z.number(),
+  name: z.string(),
+  email: z.string(),
+  birth_date: z.date().nullable(),
+  gender: z.string(),
+  telephone_number: z.string(),
+  document: z.string().nullable(),
+  objectives: z.string().nullable(),
+  history: z.string().nullable(),
+  created_date: z.date().nullable(),
+  deleted_date: z.date().nullable(),
+  modificated_date: z.date().nullable(),
+  clientInfo: clientInfoResponseSchema.nullable(),
+  clientPlanHistories: z.array(planHistoryResponseSchema),
+  clientAchiviments: z.array(achievementResponseSchema),
+  clientFeedbacks: z.array(feedbackInClientResponseSchema),
 });
 
 export const notFoundSchema = z.object({ message: z.string() });

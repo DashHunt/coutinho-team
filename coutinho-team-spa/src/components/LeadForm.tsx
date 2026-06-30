@@ -1,5 +1,5 @@
 import { useForm } from "react-hook-form";
-import type { LeadPayload } from "../services/leads";
+import type { LeadPayload } from "../services/Leads";
 import { Input } from "./ui/Input";
 import { Textarea } from "./ui/TextArea";
 import { useCreateLead } from "../queries/LeadQueries";
@@ -15,7 +15,7 @@ interface LeadFormProps {
 
 export default function LeadForm({ selectedPlan }: LeadFormProps) {
   const [openAlert, setOpenAlert] = useState(true);
-
+  
   const {
     register,
     handleSubmit,

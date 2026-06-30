@@ -1,72 +1,57 @@
-import { Card } from './ui/Card';
-
-interface TeamMember {
-  initials: string;
-  name: string;
-  role: string;
-  bio: string;
-  instagram: string;
-  instagramHref?: string;
-}
-
-const TEAM: TeamMember[] = [
-  {
-    initials: 'CT',
-    name: 'Nome do Treinador',
-    role: 'Head Coach · Powerlifting',
-    bio: 'Substitua por uma breve descrição da experiência, títulos e especialidade deste treinador.',
-    instagram: '@usuario',
-  },
-  {
-    initials: 'CT',
-    name: 'Nome do Treinador',
-    role: 'Treinador · Especialista Jr/Sub-jr',
-    bio: 'Substitua por uma breve descrição da experiência, títulos e especialidade deste treinador.',
-    instagram: '@usuario',
-  },
-  {
-    initials: 'CT',
-    name: 'Nome do Treinador',
-    role: 'Treinador · Reabilitação',
-    bio: 'Substitua por uma breve descrição da experiência, títulos e especialidade deste treinador.',
-    instagram: '@usuario',
-  },
-  {
-    initials: 'CT',
-    name: 'Nome do Treinador',
-    role: 'Treinador · Performance',
-    bio: 'Substitua por uma breve descrição da experiência, títulos e especialidade deste treinador.',
-    instagram: '@usuario',
-  },
-];
+import coachPhoto from '../assets/arthur-coutinho.jpeg';
 
 export default function Equipe() {
   return (
-    <section id="equipe" className="py-[90px]">
+    <section id="equipe" className="py-[90px] bg-elevated border-t border-b border-bone/12">
       <div className="max-w-[1180px] mx-auto px-6">
-        <div className="text-center max-w-[640px] mx-auto mb-14">
-          <p className="font-body text-[13px] font-bold uppercase tracking-[2.5px] text-ember mb-3">
+
+        <div className="text-center max-w-[640px] mx-auto mb-3">
+          <p className="font-body text-[30px] font-bold uppercase tracking-[2.5px] text-ember mb-4">
             Bastidores do time
           </p>
-          <h2 className="font-display text-[clamp(28px,4vw,42px)] leading-[1.15]">
-            Nossa equipe de treinadores
-          </h2>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-[22px]">
-          {TEAM.map((m, index) => (
-            <Card key={index} variant="elevated" hover="scale" padding="none" rounded="lg" className="px-[22px] py-[26px] text-center">
-              <div className="w-[84px] h-[84px] mx-auto mb-4 rounded-full bg-[linear-gradient(145deg,var(--color-ember-deep),#3a160d)] flex items-center justify-center font-display text-[22px] text-bone border-2 border-ember">
-                {m.initials}
-              </div>
-              <h3 className="text-[16px] mb-1 tracking-[0.3px]">{m.name}</h3>
-              <p className="text-[12px] text-ember uppercase tracking-[0.4px] mb-3">{m.role}</p>
-              <p className="text-[13.5px] text-cream/70 mb-3.5">{m.bio}</p>
-              <a href={m.instagramHref ?? '#'} className="text-[12.5px] font-bold text-ember border-b border-ember-deep pb-0.5">
-                IG: {m.instagram}
-              </a>
-            </Card>
-          ))}
+        <div className="flex flex-col md:flex-row items-center gap-[60px] lg:gap-[80px]">
+
+          {/* Foto com corte diagonal na borda direita */}
+          <div
+            className="w-full md:w-[45%] shrink-0 overflow-hidden shadow rounded"
+            style={{ clipPath: 'polygon(0 0, 100% 0, 85% 100%, 0 100%)' }}
+          >
+            <img
+              src={coachPhoto}
+              alt="Arthur Coutinho — Head Coach Coutinho Team"
+              className="w-full h-[520px] lg:h-[600px] object-cover"
+              style={{objectPosition: 'right bottom'}}
+            />
+          </div>
+
+          {/* Bio */}
+          <div className="flex-1 flex flex-col gap-5">
+            <h2 className="font-display text-[clamp(32px,4.5vw,52px)] leading-[1.08]">
+              Arthur Coutinho
+            </h2>
+
+            <p className="text-[12.5px] font-bold uppercase tracking-[2px] text-ember">
+              Head Coach · Powerlifting
+            </p>
+
+            <p className="text-[16.5px] text-cream/75 leading-relaxed max-w-[480px]">
+              Treinador de Powerlifting com atuação em competições nacionais e estaduais.
+              Medalhista pelo Brasil, desenvolve atletas de todas as categorias com foco em
+              técnica, periodização e acompanhamento próximo do primeiro treino ao pódio.
+            </p>
+
+            <a
+              href="https://instagram.com/coutinho_lifts"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="self-start text-[13px] font-bold text-ember border-b border-ember-deep pb-0.5 mt-1 hover:text-bone transition-colors duration-200"
+            >
+              IG: @coutinho_lifts
+            </a>
+          </div>
+
         </div>
       </div>
     </section>

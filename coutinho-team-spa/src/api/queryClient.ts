@@ -21,6 +21,19 @@ export const queryClient = new QueryClient({
 export const queryKeys = {
   leads: {
     all: ["leads"],
-    byId: (id: number) => ["athletes", id],
+    byId: (id: number) => ["leads", id],
   },
+  clients: {
+    all: ["clients"],
+    byId: (id: number) => ["clients", id],
+    count: ["clients", "count"],
+    medals: ["clients", "medals"],
+    national: ["clients", "national"],
+    state: ["clients", "state"],
+    topAthletes: ["clients", "top-athletes"],
+    feedbacks: ["clients", "feedbacks"],
+  },
+  feedbacks: {
+    getTopThree: ['feedbacks']
+  }
 };
