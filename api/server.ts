@@ -2,7 +2,6 @@ import { fastify } from "fastify";
 import { fastifyCors } from "@fastify/cors";
 import { fastifySwagger } from "@fastify/swagger";
 import { fastifySwaggerUi } from "@fastify/swagger-ui";
-import rateLimit from "@fastify/rate-limit";
 import {
   validatorCompiler,
   serializerCompiler,
@@ -16,6 +15,7 @@ import PlanModules from "./src/modules/plans/index";
 import ClientModules from "./src/modules/client/index";
 import FeedbackModules from "./src/modules/feedback/index";
 import fastifyJwt from "@fastify/jwt";
+import { errorHandler } from "./src/shared/middlewares/errorHandler";
 
 const server = fastify({ logger: true });
 
@@ -41,6 +41,8 @@ server.register(fastifySwaggerUi, {
 server.register(fastifyJwt, {
   secret: process.env.JWT_SECRET as string,
 });
+
+server.setErrorHandler(errorHandler);
 
 server.register(LeadModules);
 server.register(LoginModules);

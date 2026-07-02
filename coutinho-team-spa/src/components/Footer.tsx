@@ -37,7 +37,7 @@ export default function Footer() {
         {/* Contact */}
         <div>
           <h4 className="text-[16px] mb-3.5">Fale conosco</h4>
-          <p className="text-[14px] text-cream/75 mb-2">WhatsApp: (00) 00000-0000</p>
+          <p className="text-[14px] text-cream/75 mb-2">WhatsApp: (16) 99362-8778</p>
           <p className="text-[14px] text-cream/75 mb-4">contato@coutinhoteam.com.br</p>
           <a href="#" className="text-[13px] text-ember underline">
             Política de Privacidade

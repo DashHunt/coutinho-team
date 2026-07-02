@@ -107,7 +107,7 @@ export default function Atletas() {
         )}
 
         <div className=" grid grid-cols-1 sm:grid-cols-3 gap-[18px]">
-          {data.map((athlete: Athlete) => (
+          {!isLoading && !isError && !!data?.length && data.map((athlete: Athlete) => (
             <Card
               key={athlete.id}
               variant="base"
@@ -121,12 +121,12 @@ export default function Atletas() {
               </div>
               <h3 className="text-[16px] mb-2">{athlete.name}</h3>
               <ul className="list-none p-0 m-0 space-y-1">
-                {athlete.clientAchiviments.map((achiviements) => (
+                {athlete.clientAchiviments.map((achievements) => (
                   <li
-                    key={achiviements.id}
+                    key={achievements.id}
                     className="text-[13px] text-cream/70 py-1 pl-4 border-l-2 border-ember-deep"
                   >
-                    {achiviements.event_achievement}
+                    {achievements.event_achievement}
                   </li>
                 ))}
               </ul>

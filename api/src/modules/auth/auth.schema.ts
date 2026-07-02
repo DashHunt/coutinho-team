@@ -8,5 +8,9 @@ export const loginSchema = z.object({
 
 // Response schema
 export const loginResponseSchema = z.object({
+  token: z.string(),
+});
+
+export const invalidCredentialsSchema = z.object({
   message: z.string(),
 });

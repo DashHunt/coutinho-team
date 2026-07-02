@@ -30,11 +30,6 @@ export class UserController {
   ): Promise<void> {
     const { email } = request.body;
     const coach = await getUserByEmail(email);
-
-    if (!coach) {
-      return reply.code(404).send({ message: "Coach not found" });
-    }
-
     reply.send(coach);
   }
 
@@ -43,13 +38,8 @@ export class UserController {
     reply: FastifyReply,
   ): Promise<void> {
     const id = request.params.id;
-    const coach = await getUserById(id);
-
-    if (!coach) {
-      return reply.code(404).send({ message: "Coach not found" });
-    }
-
-    reply.send(coach);
+    const user = await getUserById(id);
+    reply.send(user);
   }
 
   public static async update(
@@ -57,12 +47,6 @@ export class UserController {
     reply: FastifyReply,
   ): Promise<void> {
     const { id, name, email, password } = request.body;
-    const user = await getUserById(id);
-
-    if (!user) {
-      return reply.code(404).send({ message: "Coach not found" });
-    }
-
     const updatedUser = await updateUser(id, name, email, password);
     reply.send(updatedUser);
   }
@@ -73,7 +57,6 @@ export class UserController {
   ): Promise<void> {
     const { name, email, password } = request.body;
     await createUser(name, email, password);
-
     reply.code(201).send({ message: "Coach created!" });
   }
 }

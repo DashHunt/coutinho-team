@@ -96,6 +96,7 @@ export default async function userRoutes(server: FastifyTypedInstance) {
         body: createUser,
         response: {
           201: z.object({ message: z.string() }),
+          409: z.object({ message: z.string() }).describe('E-mail already exists'),
         },
       },
     },
