@@ -13,9 +13,7 @@ export const getUserById = async (id: number) => {
   if (!user) {
     throw new NotFoundError(id);
   }
-  return await prisma.users.findUnique({
-    where: { id },
-  });
+  return user;
 };
 
 export const getUserByEmail = async (email: string) => {
@@ -26,9 +24,7 @@ export const getUserByEmail = async (email: string) => {
     throw new EmailNotFound(email);
   }
 
-  return await prisma.users.findUnique({
-    where: { email: email },
-  });
+  return user;
 };
 
 export const updateUser = async (id: number, name: string, email: string, password: string) => {
@@ -48,9 +44,15 @@ export const createUser = async (name: string, email: string, password: string) 
     throw new ConflitcError(`Email já cadastrado`);
   }
 
+  // Multi-tenancy completo ainda não existe: todo novo coach entra no time único hoje em operação.
+  const team = await prisma.team.findFirst();
+  if (!team) {
+    throw new Error("Nenhum time cadastrado ainda — rode o seed antes de criar usuários.");
+  }
+
   const hashedPassword = await hashPassword(password);
 
   return await prisma.users.create({
-    data: { name, email, password: hashedPassword },
+    data: { name, email, password: hashedPassword, team_id: team.id },
   });
 };

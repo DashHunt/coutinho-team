@@ -1,6 +1,12 @@
 import { FastifyTypedInstance } from "../../shared/types/fastifyTypedInstance";
 import { AuthController } from "./auth.controller";
-import { invalidCredentialsSchema, loginResponseSchema, loginSchema } from "./auth.schema";
+import {
+  invalidCredentialsSchema,
+  loginResponseSchema,
+  loginSchema,
+  refreshResponseSchema,
+  logoutResponseSchema,
+} from "./auth.schema";
 
 export default async function loginRoutes(server: FastifyTypedInstance) {
   // Login
@@ -19,5 +25,36 @@ export default async function loginRoutes(server: FastifyTypedInstance) {
       },
     },
     AuthController.login,
+  );
+
+  // Refresh
+  server.post(
+    "/refresh-token",
+    {
+      schema: {
+        tags: ["Login"],
+        description: "Rotate refresh token and issue a new access token",
+        response: {
+          200: refreshResponseSchema.describe("New access token issued"),
+          401: invalidCredentialsSchema.describe("Refresh token ausente ou inválido"),
+        },
+      },
+    },
+    AuthController.refresh,
+  );
+
+  // Logout
+  server.post(
+    "/logout",
+    {
+      schema: {
+        tags: ["Login"],
+        description: "Revoke refresh token and clear the session cookie",
+        response: {
+          200: logoutResponseSchema,
+        },
+      },
+    },
+    AuthController.logout,
   );
 }

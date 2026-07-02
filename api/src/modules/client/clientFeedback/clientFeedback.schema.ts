@@ -1,5 +1,4 @@
 import { z } from "zod";
-import { clientResponseSchema } from "../client/client.schema";
 
 export const feedbackByClientId = z.object({
   clientId: z.number(),
@@ -15,6 +14,11 @@ export const createFeedbackSchema = z.object({
   feedback_nps: z.enum(["PROMOTOR", "PASSIVO", "DETRATOR"]),
 });
 
+const feedbackClientSchema = z.object({
+  id: z.number(),
+  name: z.string(),
+});
+
 export const feedbackResponseSchema = z.object({
   id: z.number(),
   client_id: z.number(),
@@ -23,7 +27,7 @@ export const feedbackResponseSchema = z.object({
   created_date: z.date().nullable(),
   deleted_date: z.date().nullable(),
   modificated_date: z.date().nullable(),
-  client: clientResponseSchema.nullable(),
+  client: feedbackClientSchema.nullable(),
 });
 
 export const topThreeResponse = z.object({
