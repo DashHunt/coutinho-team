@@ -1,4 +1,5 @@
 import { prisma } from "../../../../prisma/lib/prisma";
+import { NotFoundError } from "../../../shared/middlewares/error";
 import { getTop3ClientIdsByMedals } from "../clientAchievements/clientAchievements.model";
 
 // ===================== CLIENT =====================
@@ -48,7 +49,7 @@ export const createClient = async (data: {
   sheet_link: string;
 }) => {
   const plan = await prisma.plans.findUnique({ where: { id: data.plan_id } });
-  if (!plan) throw new Error("Plan not found");
+  if (!plan) throw new NotFoundError("Plan not found");
 
   const purchasedDateObj = new Date(data.purchased_date);
   const expirationDate = new Date(purchasedDateObj);
@@ -92,8 +93,7 @@ export const createClient = async (data: {
     if (data.lead_id) {
       await transaction.lead.update({
         where: { id: data.lead_id },
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        data: { status: "CONCLUIDO" as any },
+        data: { status: "CONCLUIDO" },
       });
     }
 

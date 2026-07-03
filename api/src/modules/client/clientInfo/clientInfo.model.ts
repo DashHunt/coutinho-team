@@ -1,4 +1,5 @@
 import { prisma } from "../../../../prisma/lib/prisma";
+import { NotFoundError } from "../../../shared/middlewares/error";
 
 export const getClientInfo = async (clientId: number) => {
   return await prisma.clientInfo.findUnique({
@@ -17,7 +18,7 @@ export const updateClientInfo = async (
   },
 ) => {
   const info = await prisma.clientInfo.findUnique({ where: { client_id: clientId } });
-  if (!info) throw new Error("ClientInfo not found");
+  if (!info) throw new NotFoundError("ClientInfo not found");
 
   return await prisma.clientInfo.update({
     where: { client_id: clientId },

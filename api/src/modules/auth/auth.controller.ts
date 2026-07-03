@@ -1,7 +1,13 @@
 import { FastifyReply, FastifyRequest } from "fastify";
-import { validateCredentials, storeRefreshToken, findValidRefreshToken, revokeRefreshToken } from "./auth.model";
+import {
+  validateCredentials,
+  storeRefreshToken,
+  findValidRefreshToken,
+  revokeRefreshToken,
+} from "./auth.model";
 import { generateRefreshToken, REFRESH_TOKEN_TTL_MS } from "../../shared/utils/refreshToken";
 import { Role } from "../../../generated/prisma/enums";
+import { InvalidCredentialsError } from "../../shared/middlewares/error";
 
 type LoginBody = { Body: { email: string; password: string } };
 
@@ -32,7 +38,10 @@ async function issueTokens(
 }
 
 export class AuthController {
-  public static async login(request: FastifyRequest<LoginBody>, reply: FastifyReply): Promise<void> {
+  public static async login(
+    request: FastifyRequest<LoginBody>,
+    reply: FastifyReply,
+  ): Promise<void> {
     const { email, password } = request.body;
     const user = await validateCredentials(email, password);
     const token = await issueTokens(reply, user);
@@ -42,14 +51,12 @@ export class AuthController {
   public static async refresh(request: FastifyRequest, reply: FastifyReply): Promise<void> {
     const cookieToken = request.cookies[REFRESH_COOKIE_NAME];
     if (!cookieToken) {
-      reply.code(401).send({ message: "Refresh token ausente" });
-      return;
+      throw new InvalidCredentialsError("Refresh token ausente");
     }
 
     const storedToken = await findValidRefreshToken(cookieToken);
     if (!storedToken) {
-      reply.code(401).send({ message: "Refresh token inválido" });
-      return;
+      throw new InvalidCredentialsError("Refresh token inválido");
     }
 
     await revokeRefreshToken(storedToken.id); // rotação: invalida o antigo

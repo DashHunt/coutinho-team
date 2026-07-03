@@ -1,5 +1,5 @@
 import { prisma } from "../../../prisma/lib/prisma";
-import { ConflitcError, EmailNotFound, NotFoundError } from "../../shared/middlewares/error";
+import { ConflitcError, EmailNotFound, IdNotFound, NotFoundError } from "../../shared/middlewares/error";
 import { hashPassword } from "../../shared/utils/hashPassword";
 
 export const getUsers = async () => {
@@ -11,7 +11,7 @@ export const getUserById = async (id: number) => {
     where: { id },
   });
   if (!user) {
-    throw new NotFoundError(id);
+    throw new IdNotFound(id);
   }
   return user;
 };
@@ -47,7 +47,7 @@ export const createUser = async (name: string, email: string, password: string) 
   // Multi-tenancy completo ainda não existe: todo novo coach entra no time único hoje em operação.
   const team = await prisma.team.findFirst();
   if (!team) {
-    throw new Error("Nenhum time cadastrado ainda — rode o seed antes de criar usuários.");
+    throw new NotFoundError("Nenhum time cadastrado ainda — rode o seed antes de criar usuários.");
   }
 
   const hashedPassword = await hashPassword(password);

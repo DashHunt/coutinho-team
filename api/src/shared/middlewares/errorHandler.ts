@@ -1,13 +1,13 @@
 import { FastifyReply, FastifyRequest } from 'fastify'
 import { hasZodFastifySchemaValidationErrors } from 'fastify-type-provider-zod'
-import { ConflitcError, EmailNotFound, InactiveError, InvalidCredentialsError, NotFoundError, ValidationError } from './error'
+import { ConflitcError, EmailNotFound, IdNotFound, InactiveError, InvalidCredentialsError, NotFoundError, ValidationError } from './error'
 
 export function errorHandler(
   error: Error,
   _request: FastifyRequest,
   reply: FastifyReply,
 ) {
-  if (error instanceof NotFoundError) {
+  if (error instanceof IdNotFound || error instanceof NotFoundError) {
     return reply.status(404).send({ message: error.message })
   }
   if (error instanceof EmailNotFound) {

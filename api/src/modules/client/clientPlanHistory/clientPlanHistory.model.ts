@@ -1,4 +1,5 @@
 import { prisma } from "../../../../prisma/lib/prisma";
+import { NotFoundError } from "../../../shared/middlewares/error";
 
 export const getPlanHistory = async (clientId: number) => {
   return await prisma.clientPlanHistory.findMany({
@@ -13,7 +14,7 @@ export const addPlanToClient = async (
   purchasedDate: string,
 ) => {
   const plan = await prisma.plans.findUnique({ where: { id: planId } });
-  if (!plan) throw new Error("Plan not found");
+  if (!plan) throw new NotFoundError("Plan not found");
 
   const purchasedDateObj = new Date(purchasedDate);
   const expirationDate = new Date(purchasedDateObj);
