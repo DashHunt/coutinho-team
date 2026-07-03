@@ -1,5 +1,5 @@
 import { FastifyRequest, FastifyReply } from "fastify";
-import { getFeedbacksByClient, createFeedback, softDeleteFeedback, getAll, getFirstThree } from "./feedback.model";
+import { getFeedbacksByClient, createFeedback, softDeleteFeedback, getAll, getFirstThree } from "./clientFeedback.model";
 
 type GetByClientParams = { Params: { clientId: number } };
 type DeleteParams = { Params: { feedbackId: number } };
@@ -11,7 +11,7 @@ type CreateBody = {
   };
 };
 
-export class FeedbackController {
+export class ClientFeedbackController {
   public static async getAll(_request: FastifyRequest, reply: FastifyReply): Promise<void> {
     reply.send(await getAll());
   }

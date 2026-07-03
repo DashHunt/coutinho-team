@@ -11,6 +11,14 @@ export const loginResponseSchema = z.object({
   token: z.string(),
 });
 
+export const refreshResponseSchema = z.object({
+  token: z.string(),
+});
+
+export const logoutResponseSchema = z.object({
+  message: z.string(),
+});
+
 export const invalidCredentialsSchema = z.object({
   message: z.string(),
 });

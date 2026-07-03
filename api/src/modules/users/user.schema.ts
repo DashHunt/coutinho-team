@@ -28,6 +28,8 @@ export const userResponse = z.object({
   name: z.string(),
   email: z.string(),
   password: z.string(),
+  team_id: z.number().nullable(),
+  role: z.string(),
   created_date: z.date().nullable(),
   deleted_date: z.date().nullable(),
   modificated_date: z.date().nullable(),

@@ -1,7 +1,7 @@
 import z from "zod";
-import { FastifyTypedInstance } from "../../shared/types/fastifyTypedInstance";
-import { FeedbackController } from "./feedback.controller";
-import { authenticate } from "../../shared/utils/authHook";
+import { FastifyTypedInstance } from "../../../shared/types/fastifyTypedInstance";
+import { ClientFeedbackController } from "./clientFeedback.controller";
+import { authenticate } from "../../../shared/utils/authHook";
 import {
   feedbackByClientId,
   feedbackById,
@@ -11,9 +11,9 @@ import {
   createdFeedbackSchema,
   deletedFeedbackSchema,
   topThreeResponse,
-} from "./feedback.schema";
+} from "./clientFeedback.schema";
 
-export default async function feedbackRoutes(server: FastifyTypedInstance) {
+export default async function clientFeedbackRoutes(server: FastifyTypedInstance) {
   server.get(
     "/feedbacks",
     {
@@ -25,7 +25,7 @@ export default async function feedbackRoutes(server: FastifyTypedInstance) {
         },
       },
     },
-    FeedbackController.getAll,
+    ClientFeedbackController.getAll,
   );
 
   server.get(
@@ -39,7 +39,7 @@ export default async function feedbackRoutes(server: FastifyTypedInstance) {
         },
       },
     },
-    FeedbackController.getFirstThree,
+    ClientFeedbackController.getFirstThree,
   );
 
   server.get(
@@ -55,7 +55,7 @@ export default async function feedbackRoutes(server: FastifyTypedInstance) {
         },
       },
     },
-    FeedbackController.getByClient,
+    ClientFeedbackController.getByClient,
   );
 
   server.post(
@@ -73,7 +73,7 @@ export default async function feedbackRoutes(server: FastifyTypedInstance) {
         },
       },
     },
-    FeedbackController.create,
+    ClientFeedbackController.create,
   );
 
   server.delete(
@@ -89,6 +89,6 @@ export default async function feedbackRoutes(server: FastifyTypedInstance) {
         },
       },
     },
-    FeedbackController.remove,
+    ClientFeedbackController.remove,
   );
 }

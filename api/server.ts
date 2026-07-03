@@ -1,5 +1,6 @@
 import { fastify } from "fastify";
 import { fastifyCors } from "@fastify/cors";
+import { fastifyCookie } from "@fastify/cookie";
 import { fastifySwagger } from "@fastify/swagger";
 import { fastifySwaggerUi } from "@fastify/swagger-ui";
 import {
@@ -13,7 +14,6 @@ import LoginModules from "./src/modules/auth/index";
 import userModules from "./src/modules/users/index";
 import PlanModules from "./src/modules/plans/index";
 import ClientModules from "./src/modules/client/index";
-import FeedbackModules from "./src/modules/feedback/index";
 import fastifyJwt from "@fastify/jwt";
 import { errorHandler } from "./src/shared/middlewares/errorHandler";
 
@@ -22,7 +22,12 @@ const server = fastify({ logger: true });
 server.setValidatorCompiler(validatorCompiler);
 server.setSerializerCompiler(serializerCompiler);
 
-server.register(fastifyCors, { origin: "*" });
+server.register(fastifyCors, {
+  origin: process.env.CORS_ORIGIN,
+  credentials: true,
+});
+
+server.register(fastifyCookie);
 
 server.register(fastifySwagger, {
   openapi: {
@@ -49,7 +54,6 @@ server.register(LoginModules);
 server.register(userModules);
 server.register(PlanModules);
 server.register(ClientModules);
-server.register(FeedbackModules);
 
 server.listen({ port: 3333, host: "0.0.0.0" }).then(() => {
   console.log("SERVER RUNNING ON PORT 3333");

@@ -1,6 +1,12 @@
-export class NotFoundError extends Error {
+export class IdNotFound extends Error {
   constructor(id: number) {
     super(`Recurso não encontrado ${id}`)
+    this.name = 'IdNotFound'
+  }
+}
+export class NotFoundError extends Error {
+  constructor(message: string) {
+    super(message)
     this.name = 'NotFoundError'
   }
 }

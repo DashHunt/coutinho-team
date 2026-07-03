@@ -50,16 +50,46 @@ enum FeedbackOptions {
   DETRATOR
 }
 
-// ===================== USERS =====================
+enum Role {
+  ADMIN
+  COACH
+}
 
-model Users {
+// ===================== TEAM =====================
+
+model Team {
   id               Int       @id @default(autoincrement())
   name             String
-  email            String    @unique
-  password         String
   created_date     DateTime  @default(now())
   deleted_date     DateTime?
   modificated_date DateTime  @updatedAt
+  users            Users[]
+}
+
+// ===================== USERS =====================
+
+model Users {
+  id               Int            @id @default(autoincrement())
+  name             String
+  email            String         @unique
+  password         String
+  role             Role           @default(COACH)
+  team_id          Int
+  team             Team           @relation(fields: [team_id], references: [id])
+  refreshTokens    RefreshToken[]
+  created_date     DateTime       @default(now())
+  deleted_date     DateTime?
+  modificated_date DateTime       @updatedAt
+}
+
+model RefreshToken {
+  id           Int      @id @default(autoincrement())
+  token_hash   String   @unique
+  user_id      Int
+  user         Users    @relation(fields: [user_id], references: [id])
+  expires_at   DateTime
+  revoked      Boolean  @default(false)
+  created_date DateTime @default(now())
 }
 
 // ===================== LEADS =====================
