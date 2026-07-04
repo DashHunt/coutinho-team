@@ -1,6 +1,7 @@
 import type { RouteObject } from 'react-router-dom'
 import { loginPageRoute } from './login/login.route'
 import { homePageRoute } from './home/home.route'
+import { leadsPageRoute } from './leads/leads.route'
 import { ProtectedRoute } from '../shared/router/ProtectedRoute'
 import { AppLayout } from '../shared/layouts/AppLayout'
 
@@ -12,7 +13,7 @@ export const routes: RouteObject[] = [
     children: [
       {
         Component: AppLayout,
-        children: [homePageRoute],
+        children: [homePageRoute, leadsPageRoute],
       },
     ],
   },

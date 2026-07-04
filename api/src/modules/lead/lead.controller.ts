@@ -1,9 +1,26 @@
 import { FastifyRequest, FastifyReply } from "fastify";
-import { createLead, getLeadById, getLeads, updateLead } from "./lead.model";
-import { hashPassword } from "../../shared/utils/hashPassword";
+import {
+  createLead,
+  getLeadById,
+  getLeads,
+  updateLead,
+  softDeleteLead,
+  reactivateLead,
+} from "./lead.model";
 import { sendLeadConfirmationEmail } from "../../shared/utils/mailer";
 
-type GetByIdBody = { Params: { id: number } };
+type LeadIdParams = { Params: { id: number } };
+
+type ListQuery = {
+  Querystring: {
+    page: number;
+    limit: number;
+    search?: string;
+    status?: "CRIADO" | "INATIVO" | "EM_ANDAMENTO" | "CONCLUIDO";
+    deleted: boolean;
+  };
+};
+
 type UpdateBody = {
   Body: {
     id: number;
@@ -12,8 +29,10 @@ type UpdateBody = {
     telephone_number: string;
     history: string;
     selected_plan: string;
+    status?: "CRIADO" | "INATIVO" | "EM_ANDAMENTO" | "CONCLUIDO";
   };
 };
+
 type CreateBody = {
   Body: {
     name: string;
@@ -21,49 +40,29 @@ type CreateBody = {
     telephone_number: string;
     history: string;
     selected_plan: string;
-    status: string;
   };
 };
 
 export class LeadController {
-  public static async getAll(_request: FastifyRequest, reply: FastifyReply): Promise<void> {
-    reply.send(await getLeads());
+  public static async getAll(request: FastifyRequest<ListQuery>, reply: FastifyReply): Promise<void> {
+    reply.send(await getLeads(request.query));
   }
 
   public static async getById(
-    request: FastifyRequest<GetByIdBody>,
+    request: FastifyRequest<LeadIdParams>,
     reply: FastifyReply,
   ): Promise<void> {
-    const id = request.params.id;
-    const coach = await getLeadById(id);
-
-    if (!coach) {
-      return reply.code(404).send({ message: "Coach not found" });
-    }
-
-    reply.send(coach);
+    const lead = await getLeadById(request.params.id);
+    reply.send(lead);
   }
 
   public static async update(
     request: FastifyRequest<UpdateBody>,
     reply: FastifyReply,
   ): Promise<void> {
-    const { id, name, email, telephone_number, history, selected_plan } = request.body;
-    const user = await getLeadById(id);
-
-    if (!user) {
-      return reply.code(404).send({ message: "Coach not found" });
-    }
-
-    const updatedCoach = await updateLead(
-      id,
-      name,
-      email,
-      telephone_number,
-      history,
-      selected_plan,
-    );
-    reply.send(updatedCoach);
+    const { id, ...data } = request.body;
+    const updatedLead = await updateLead(id, data);
+    reply.send(updatedLead);
   }
 
   public static async create(
@@ -79,6 +78,19 @@ export class LeadController {
       request.log.error({ err }, "Falha ao enviar email de confirmação para o lead");
     }
 
-    reply.code(201).send({ message: "Coach created!" });
+    reply.code(201).send({ message: "Lead created!" });
+  }
+
+  public static async remove(request: FastifyRequest<LeadIdParams>, reply: FastifyReply): Promise<void> {
+    await softDeleteLead(request.params.id);
+    reply.send({ message: "Lead deleted!" });
+  }
+
+  public static async reactivate(
+    request: FastifyRequest<LeadIdParams>,
+    reply: FastifyReply,
+  ): Promise<void> {
+    await reactivateLead(request.params.id);
+    reply.send({ message: "Lead reactivated!" });
   }
 }

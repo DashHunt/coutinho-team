@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 export const planById = z.object({
-  id: z.number(),
+  id: z.coerce.number(),
 });
 
 export const createPlanSchema = z.object({

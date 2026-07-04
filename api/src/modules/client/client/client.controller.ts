@@ -70,13 +70,8 @@ export class ClientController {
     request: FastifyRequest<CreateClientBody>,
     reply: FastifyReply,
   ): Promise<void> {
-    try {
-      await createClient(request.body);
-      reply.code(201).send({ message: "Client created!" });
-    } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : "Internal server error";
-      reply.code(400).send({ message });
-    }
+    await createClient(request.body);
+    reply.code(201).send({ message: "Client created!" });
   }
 
   public static async update(

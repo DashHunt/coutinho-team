@@ -1,12 +1,12 @@
 import { z } from "zod";
 
 export const clientIdParams = z.object({
-  id: z.number(),
+  id: z.coerce.number(),
 });
 
 export const achievementParams = z.object({
-  id: z.number(),
-  achievementId: z.number(),
+  id: z.coerce.number(),
+  achievementId: z.coerce.number(),
 });
 
 export const createAchievementSchema = z.object({

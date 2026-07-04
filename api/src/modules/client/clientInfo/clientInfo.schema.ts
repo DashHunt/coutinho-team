@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 export const clientIdParams = z.object({
-  id: z.number(),
+  id: z.coerce.number(),
 });
 
 export const updateClientInfoSchema = z.object({

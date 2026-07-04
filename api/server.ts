@@ -17,7 +17,7 @@ import ClientModules from "./src/modules/client/index";
 import fastifyJwt from "@fastify/jwt";
 import { errorHandler } from "./src/shared/middlewares/errorHandler";
 
-const server = fastify({ logger: true });
+const server = fastify();
 
 server.setValidatorCompiler(validatorCompiler);
 server.setSerializerCompiler(serializerCompiler);
@@ -55,6 +55,6 @@ server.register(userModules);
 server.register(PlanModules);
 server.register(ClientModules);
 
-server.listen({ port: 3333, host: "0.0.0.0" }).then(() => {
-  console.log("SERVER RUNNING ON PORT 3333");
+server.listen({ port: 8080, host: "0.0.0.0" }).then(() => {
+  console.log("SERVER RUNNING ON PORT 8080");
 });

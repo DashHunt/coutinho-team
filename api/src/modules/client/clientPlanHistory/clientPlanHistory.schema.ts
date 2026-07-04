@@ -1,12 +1,12 @@
 import { z } from "zod";
 
 export const clientIdParams = z.object({
-  id: z.number(),
+  id: z.coerce.number(),
 });
 
 export const planHistoryParams = z.object({
-  id: z.number(),
-  historyId: z.number(),
+  id: z.coerce.number(),
+  historyId: z.coerce.number(),
 });
 
 export const addPlanHistorySchema = z.object({

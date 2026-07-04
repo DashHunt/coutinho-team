@@ -1,21 +1,13 @@
 import { Outlet } from "react-router-dom";
-import { useAuthStore } from "../../features/auth/authStore";
-import { useLogout } from "../../features/auth/hooks/useLogout";
+import { NavBar } from "../ui/NavBar";
+
+const NAV_LINKS = [{ to: "/leads", label: "Leads" }];
 
 export function AppLayout() {
-  const user = useAuthStore((state) => state.user);
-  const logout = useLogout();
-
   return (
-    <div>
-      <header>
-        <span>Coutinho Team CRM</span>
-        {user && <span> — {user.email} ({user.role})</span>}
-        <button type="button" onClick={() => logout.mutate()}>
-          Sair
-        </button>
-      </header>
-      <main>
+    <div className="flex min-h-svh flex-col bg-base text-cream sm:flex-row">
+      <NavBar links={NAV_LINKS} />
+      <main className="flex-1">
         <Outlet />
       </main>
     </div>

@@ -1,26 +1,22 @@
 import { QueryClient } from "@tanstack/react-query";
 
-/**
- * Configure and create the React Query client
- * Includes global configuration for queries and mutations
- */
+// Configurador global do QueryClient
 export const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      retry: 1, // Retry failed requests once
-      refetchOnWindowFocus: false, // Disable automatic refetch on window focus
-      staleTime: 30000, // Consider data fresh for 30 seconds
+      retry: 1,
+      refetchOnWindowFocus: false,
+      staleTime: 30000, // Considera os dados como "frescos" por 30 segundos
     },
   },
 });
 
-/**
- * Query key factory
- * Provides consistent query keys across the application
- */
+// Query key factory
+// Fornece as keys para a aplicação
 export const queryKeys = {
   leads: {
-    all: ["leads"],
-    byId: (id: number) => ["athletes", id],
+    all: () => ["leads"] as const,
+    list: (params: Record<string, unknown>) => ["leads", "list", params] as const,
+    byId: (id: number) => ["leads", id] as const,
   },
 };
