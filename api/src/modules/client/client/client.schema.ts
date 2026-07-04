@@ -4,7 +4,7 @@ import { planHistoryResponseSchema } from "../clientPlanHistory/clientPlanHistor
 import { achievementResponseSchema } from "../clientAchievements/clientAchievements.schema";
 
 export const clientById = z.object({
-  id: z.number(),
+  id: z.coerce.number(),
 });
 
 export const createClientSchema = z.object({
@@ -90,5 +90,6 @@ export const topMedalistResponseSchema = z.object({
 export const countResponseSchema = z.object({ total: z.number() });
 
 export const notFoundSchema = z.object({ message: z.string() });
+export const conflictSchema = z.object({ message: z.string() });
 export const createdClientSchema = z.object({ message: z.string() });
 export const deletedClientSchema = z.object({ message: z.string() });

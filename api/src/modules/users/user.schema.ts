@@ -2,7 +2,7 @@ import { z } from "zod";
 
 //Validation schemas
 export const userById = z.object({
-  id: z.number(),
+  id: z.coerce.number(),
 });
 
 export const userByEmail = z.object({

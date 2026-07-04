@@ -10,6 +10,7 @@ import {
   countResponseSchema,
   topMedalistResponseSchema,
   notFoundSchema,
+  conflictSchema,
   createdClientSchema,
   deletedClientSchema,
 } from "./client.schema";
@@ -132,7 +133,8 @@ export default async function clientRoutes(server: FastifyTypedInstance) {
         body: createClientSchema,
         response: {
           201: createdClientSchema.describe("Client created successfully"),
-          400: notFoundSchema,
+          404: notFoundSchema.describe("Plan or Lead not found"),
+          409: conflictSchema.describe("Lead already converted to a client"),
         },
       },
     },

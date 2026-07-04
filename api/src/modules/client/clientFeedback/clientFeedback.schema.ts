@@ -1,11 +1,11 @@
 import { z } from "zod";
 
 export const feedbackByClientId = z.object({
-  clientId: z.number(),
+  clientId: z.coerce.number(),
 });
 
 export const feedbackById = z.object({
-  feedbackId: z.number(),
+  feedbackId: z.coerce.number(),
 });
 
 export const createFeedbackSchema = z.object({

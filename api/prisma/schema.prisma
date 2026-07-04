@@ -105,6 +105,7 @@ model Lead {
   created_date     DateTime   @default(now())
   deleted_date     DateTime?
   modificated_date DateTime   @updatedAt
+  client           Client?
 }
 
 // ===================== PLANS =====================
@@ -142,6 +143,8 @@ model Client {
   clientAchiviments   ClientAchievements[]
   clientPlanHistories ClientPlanHistory[]
   clientFeedbacks     ClientFeedback[]
+  lead_id             Int?                 @unique
+  lead                Lead?                @relation(fields: [lead_id], references: [id])
 }
 
 model ClientPlanHistory {

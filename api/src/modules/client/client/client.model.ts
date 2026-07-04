@@ -1,5 +1,5 @@
 import { prisma } from "../../../../prisma/lib/prisma";
-import { NotFoundError } from "../../../shared/middlewares/error";
+import { ConflitcError, NotFoundError } from "../../../shared/middlewares/error";
 import { getTop3ClientIdsByMedals } from "../clientAchievements/clientAchievements.model";
 
 // ===================== CLIENT =====================
@@ -51,6 +51,12 @@ export const createClient = async (data: {
   const plan = await prisma.plans.findUnique({ where: { id: data.plan_id } });
   if (!plan) throw new NotFoundError("Plan not found");
 
+  if (data.lead_id) {
+    const lead = await prisma.lead.findUnique({ where: { id: data.lead_id }, include: { client: true } });
+    if (!lead) throw new NotFoundError("Lead not found");
+    if (lead.client) throw new ConflitcError("Lead já convertido em cliente");
+  }
+
   const purchasedDateObj = new Date(data.purchased_date);
   const expirationDate = new Date(purchasedDateObj);
   expirationDate.setDate(expirationDate.getDate() + plan.duration);
@@ -66,6 +72,7 @@ export const createClient = async (data: {
         document: data.document,
         objectives: data.objectives,
         history: data.history,
+        lead_id: data.lead_id,
       },
     });
 

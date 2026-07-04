@@ -8,7 +8,7 @@ type PaginationProps = {
 
 export function Pagination({ page, totalPages, onPageChange }: PaginationProps) {
   return (
-    <div className="flex items-center justify-between gap-4 py-4">
+    <div className="flex items-center justify-center gap-4 py-4">
       <Button variantTone="secondary" size="sm" disabled={page <= 1} onClick={() => onPageChange(page - 1)}>
         Anterior
       </Button>
