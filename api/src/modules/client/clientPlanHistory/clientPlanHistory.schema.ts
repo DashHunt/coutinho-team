@@ -27,6 +27,16 @@ export const planHistoryResponseSchema = z.object({
   status: z.string(),
   created_date: z.date().nullable(),
   modificated_date: z.date().nullable(),
+  Plan: z
+    .object({
+      id: z.number(),
+      name: z.string(),
+      mode: z.string(),
+      duration: z.number(),
+      monthly_value: z.number(),
+      total_value: z.number(),
+    })
+    .optional(),
 });
 
 export const notFoundSchema = z.object({ message: z.string() });
