@@ -34,9 +34,9 @@ export function ClientsPage() {
   const closeModal = () => setActiveModal(null);
 
   return (
-    <div className="flex flex-col gap-4 p-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-xl font-semibold">Clientes</h1>
+    <div className="container flex flex-col gap-4 p-6">
+      <div className="flex items-center justify-around md:justify-between">
+        <h1 className="text-[36px] font-semibold">Clientes</h1>
         <Button onClick={() => setActiveModal({ type: "create" })}>Novo Cliente</Button>
       </div>
 
