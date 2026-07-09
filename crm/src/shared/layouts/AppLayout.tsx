@@ -4,6 +4,7 @@ import { NavBar } from "../ui/NavBar";
 const NAV_LINKS = [
   { to: "/leads", label: "Leads" },
   { to: "/clients", label: "Clientes" },
+  { to: "/plans", label: "Planos" },
 ];
 
 export function AppLayout() {

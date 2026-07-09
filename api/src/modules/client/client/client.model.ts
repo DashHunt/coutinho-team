@@ -50,7 +50,7 @@ const filterClientIdsByCurrentPlanStatus = async (clientIds: number[], planStatu
 
 export const getClients = async ({ page, limit, search, planStatus, deleted }: ListClientsParams) => {
   const baseWhere = {
-    deleted_date: deleted ? { not: null } : null,
+    deleted_date: deleted ?  null : { not: null },
     ...(search
       ? {
           OR: [

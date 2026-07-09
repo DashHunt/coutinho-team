@@ -5,9 +5,21 @@ import {
   createPlan,
   updatePlan,
   softDeletePlan,
+  reactivatePlan,
 } from "./plan.model";
 
-type GetByIdParams = { Params: { id: number } };
+type PlanIdParams = { Params: { id: number } };
+
+type ListQuery = {
+  Querystring: {
+    page: number;
+    limit: number;
+    search?: string;
+    status?: "ATIVO" | "INATIVO";
+    deleted: boolean;
+  };
+};
+
 type CreateBody = {
   Body: {
     name: string;
@@ -15,9 +27,10 @@ type CreateBody = {
     duration: number;
     monthly_value: number;
     total_value: number;
-    status: string;
+    status: "ATIVO" | "INATIVO";
   };
 };
+
 type UpdateBody = {
   Body: {
     id: number;
@@ -26,27 +39,20 @@ type UpdateBody = {
     duration: number;
     monthly_value: number;
     total_value: number;
-    status: string;
+    status: "ATIVO" | "INATIVO";
   };
 };
-type DeleteParams = { Params: { id: number } };
 
 export class PlanController {
-  public static async getAll(_request: FastifyRequest, reply: FastifyReply): Promise<void> {
-    reply.send(await getPlans());
+  public static async getAll(request: FastifyRequest<ListQuery>, reply: FastifyReply): Promise<void> {
+    reply.send(await getPlans(request.query));
   }
 
   public static async getById(
-    request: FastifyRequest<GetByIdParams>,
+    request: FastifyRequest<PlanIdParams>,
     reply: FastifyReply,
   ): Promise<void> {
-    const { id } = request.params;
-    const plan = await getPlanById(id);
-
-    if (!plan) {
-      return reply.code(404).send({ message: "Plan not found" });
-    }
-
+    const plan = await getPlanById(request.params.id);
     reply.send(plan);
   }
 
@@ -54,8 +60,7 @@ export class PlanController {
     request: FastifyRequest<CreateBody>,
     reply: FastifyReply,
   ): Promise<void> {
-    const { name, mode, duration, monthly_value, total_value, status } = request.body;
-    await createPlan(name, mode, duration, monthly_value, total_value, status);
+    await createPlan(request.body);
     reply.code(201).send({ message: "Plan created!" });
   }
 
@@ -63,29 +68,21 @@ export class PlanController {
     request: FastifyRequest<UpdateBody>,
     reply: FastifyReply,
   ): Promise<void> {
-    const { id, name, mode, duration, monthly_value, total_value, status } = request.body;
-    const plan = await getPlanById(id);
-
-    if (!plan) {
-      return reply.code(404).send({ message: "Plan not found" });
-    }
-
-    const updated = await updatePlan(id, name, mode, duration, monthly_value, total_value, status);
-    reply.send(updated);
+    const { id, ...data } = request.body;
+    const updatedPlan = await updatePlan(id, data);
+    reply.send(updatedPlan);
   }
 
-  public static async remove(
-    request: FastifyRequest<DeleteParams>,
+  public static async remove(request: FastifyRequest<PlanIdParams>, reply: FastifyReply): Promise<void> {
+    await softDeletePlan(request.params.id);
+    reply.send({ message: "Plan deleted!" });
+  }
+
+  public static async reactivate(
+    request: FastifyRequest<PlanIdParams>,
     reply: FastifyReply,
   ): Promise<void> {
-    const { id } = request.params;
-    const plan = await getPlanById(id);
-
-    if (!plan) {
-      return reply.code(404).send({ message: "Plan not found" });
-    }
-
-    await softDeletePlan(id);
-    reply.send({ message: "Plan deleted!" });
+    await reactivatePlan(request.params.id);
+    reply.send({ message: "Plan reactivated!" });
   }
 }

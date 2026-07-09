@@ -3,6 +3,7 @@ import { loginPageRoute } from './login/login.route'
 import { homePageRoute } from './home/home.route'
 import { leadsPageRoute } from './leads/leads.route'
 import { clientsPageRoute, clientDetailPageRoute } from './clients/clients.route'
+import { plansPageRoute } from './plans/plans.route'
 import { ProtectedRoute } from '../shared/router/ProtectedRoute'
 import { AppLayout } from '../shared/layouts/AppLayout'
 
@@ -14,7 +15,7 @@ export const routes: RouteObject[] = [
     children: [
       {
         Component: AppLayout,
-        children: [homePageRoute, leadsPageRoute, clientsPageRoute, clientDetailPageRoute],
+        children: [homePageRoute, leadsPageRoute, clientsPageRoute, clientDetailPageRoute, plansPageRoute],
       },
     ],
   },
