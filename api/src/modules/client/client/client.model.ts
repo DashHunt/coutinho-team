@@ -1,25 +1,114 @@
 import { prisma } from "../../../../prisma/lib/prisma";
-import { ConflitcError, NotFoundError } from "../../../shared/middlewares/error";
+import { ConflitcError, IdNotFound, NotFoundError } from "../../../shared/middlewares/error";
 import { getTop3ClientIdsByMedals } from "../clientAchievements/clientAchievements.model";
+import { paginate } from "../../../shared/utils/pagination";
+
+type PlanStatus = "ATIVO" | "INATIVO" | "EM_RENOVACAO";
+
+type ListClientsParams = {
+  page: number;
+  limit: number;
+  search?: string;
+  planStatus?: PlanStatus;
+  deleted: boolean;
+};
 
 // ===================== CLIENT =====================
 
-export const getClients = async () => {
-  return await prisma.client.findMany({
-    where: { deleted_date: null },
-    include: {
-      clientInfo: true,
-      clientPlanHistories: {
-        where: { status: "ATIVO" },
-      },
-      clientAchiviments: { where: { deleted_date: null } },
-      clientFeedbacks: { where: { deleted_date: null } },
-    },
+const getCurrentPlanHistories = async (clientIds: number[]) => {
+  if (clientIds.length === 0) return [];
+
+  return await prisma.clientPlanHistory.findMany({
+    where: { client_id: { in: clientIds } },
+    distinct: ["client_id"],
+    orderBy: { created_date: "desc" },
+    include: { Plan: true },
   });
 };
 
+const getCurrentPlansByClientIds = async (clientIds: number[]) => {
+  const currentPlanHistories = await getCurrentPlanHistories(clientIds);
+
+  return new Map(
+    currentPlanHistories.map((history) => [
+      history.client_id,
+      {
+        id: history.id,
+        status: history.status,
+        plan: { id: history.Plan.id, name: history.Plan.name, mode: history.Plan.mode },
+      },
+    ]),
+  );
+};
+
+const filterClientIdsByCurrentPlanStatus = async (clientIds: number[], planStatus: PlanStatus) => {
+  const currentPlanHistories = await getCurrentPlanHistories(clientIds);
+  return currentPlanHistories
+    .filter((history) => history.status === planStatus)
+    .map((history) => history.client_id);
+};
+
+export const getClients = async ({ page, limit, search, planStatus, deleted }: ListClientsParams) => {
+  const baseWhere = {
+    deleted_date: deleted ? { not: null } : null,
+    ...(search
+      ? {
+          OR: [
+            { name: { contains: search, mode: "insensitive" as const } },
+            { email: { contains: search, mode: "insensitive" as const } },
+          ],
+        }
+      : {}),
+  };
+
+  let matchingClientIds: number[] | undefined;
+  if (planStatus) {
+    const candidateClients = await prisma.client.findMany({ where: baseWhere, select: { id: true } });
+    matchingClientIds = await filterClientIdsByCurrentPlanStatus(
+      candidateClients.map((client) => client.id),
+      planStatus,
+    );
+  }
+
+  const where = {
+    ...baseWhere,
+    ...(matchingClientIds ? { id: { in: matchingClientIds } } : {}),
+  };
+
+  const result = await paginate(
+    { page, limit },
+    ({ skip, take }) =>
+      prisma.client.findMany({
+        where,
+        skip,
+        take,
+        orderBy: { created_date: "desc" },
+        include: { clientAchiviments: { where: { deleted_date: null } } },
+      }),
+    () => prisma.client.count({ where }),
+  );
+
+  const currentPlanByClientId = await getCurrentPlansByClientIds(result.data.map((client) => client.id));
+
+  return {
+    ...result,
+    data: result.data.map((client) => ({
+      id: client.id,
+      name: client.name,
+      email: client.email,
+      telephone_number: client.telephone_number,
+      gender: client.gender,
+      birth_date: client.birth_date,
+      created_date: client.created_date,
+      deleted_date: client.deleted_date,
+      currentPlan: currentPlanByClientId.get(client.id) ?? null,
+      achievementsCount: client.clientAchiviments.length,
+    })),
+  };
+};
+
 export const getClientById = async (id: number) => {
-  return await prisma.client.findUnique({
+  const client = await prisma.client.findUnique({
     where: { id },
     include: {
       clientInfo: true,
@@ -28,6 +117,12 @@ export const getClientById = async (id: number) => {
       clientFeedbacks: { where: { deleted_date: null } },
     },
   });
+
+  if (!client) {
+    throw new IdNotFound(id);
+  }
+
+  return client;
 };
 
 export const createClient = async (data: {
@@ -121,6 +216,8 @@ export const updateClient = async (
     history?: string;
   },
 ) => {
+  await getClientById(id);
+
   return await prisma.client.update({
     where: { id },
     data: {
@@ -137,9 +234,20 @@ export const updateClient = async (
 };
 
 export const softDeleteClient = async (id: number) => {
+  await getClientById(id);
+
   return await prisma.client.update({
     where: { id },
     data: { deleted_date: new Date() },
+  });
+};
+
+export const reactivateClient = async (id: number) => {
+  await getClientById(id);
+
+  return await prisma.client.update({
+    where: { id },
+    data: { deleted_date: null },
   });
 };
 
@@ -157,18 +265,13 @@ export const getTop3ByMedals = async () => {
 
   const clients = await prisma.client.findMany({
     where: { id: { in: clientIds } },
-    include: {
-      clientInfo: true,
-      clientPlanHistories: { include: { Plan: true } },
-      clientAchiviments: { where: { deleted_date: null } },
-      clientFeedbacks: { where: { deleted_date: null } },
-    },
+    select: { id: true, name: true },
   });
 
   return ranking
     .map((entry) => {
       const client = clients.find((candidate) => candidate.id === entry.clientId);
-      return client ? { ...client, medal_count: entry.medalCount } : null;
+      return client ? { id: client.id, name: client.name, medal_count: entry.medalCount } : null;
     })
     .filter(Boolean);
 };

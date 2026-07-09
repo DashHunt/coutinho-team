@@ -20,14 +20,23 @@ export const addPlanToClient = async (
   const expirationDate = new Date(purchasedDateObj);
   expirationDate.setDate(expirationDate.getDate() + plan.duration);
 
-  return await prisma.clientPlanHistory.create({
-    data: {
-      client_id: clientId,
-      plan_id: planId,
-      purchased_date: purchasedDateObj,
-      expiration_date: expirationDate,
-      status: "ATIVO",
-    },
+  return await prisma.$transaction(async (transaction) => {
+    // Garante um só plano corrente por cliente: qualquer plano ainda ATIVO/EM_RENOVACAO
+    // vira INATIVO antes de criar o novo.
+    await transaction.clientPlanHistory.updateMany({
+      where: { client_id: clientId, status: { in: ["ATIVO", "EM_RENOVACAO"] } },
+      data: { status: "INATIVO" },
+    });
+
+    return await transaction.clientPlanHistory.create({
+      data: {
+        client_id: clientId,
+        plan_id: planId,
+        purchased_date: purchasedDateObj,
+        expiration_date: expirationDate,
+        status: "ATIVO",
+      },
+    });
   });
 };
 

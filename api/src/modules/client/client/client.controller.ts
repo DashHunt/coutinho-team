@@ -5,12 +5,23 @@ import {
   createClient,
   updateClient,
   softDeleteClient,
+  reactivateClient,
   countAthletes,
   getTop3ByMedals,
 } from "./client.model";
 import { countMedals, countMedalsByLevel } from "../clientAchievements/clientAchievements.model";
 
 type ClientIdParams = { Params: { id: number } };
+
+type ListQuery = {
+  Querystring: {
+    page: number;
+    limit: number;
+    search?: string;
+    planStatus?: "ATIVO" | "INATIVO" | "EM_RENOVACAO";
+    deleted: boolean;
+  };
+};
 
 type CreateClientBody = {
   Body: {
@@ -48,21 +59,15 @@ type UpdateClientBody = {
 };
 
 export class ClientController {
-  public static async getAll(_request: FastifyRequest, reply: FastifyReply): Promise<void> {
-    reply.send(await getClients());
+  public static async getAll(request: FastifyRequest<ListQuery>, reply: FastifyReply): Promise<void> {
+    reply.send(await getClients(request.query));
   }
 
   public static async getById(
     request: FastifyRequest<ClientIdParams>,
     reply: FastifyReply,
   ): Promise<void> {
-    const { id } = request.params;
-    const client = await getClientById(id);
-
-    if (!client) {
-      return reply.code(404).send({ message: "Client not found" });
-    }
-
+    const client = await getClientById(request.params.id);
     reply.send(client);
   }
 
@@ -79,12 +84,6 @@ export class ClientController {
     reply: FastifyReply,
   ): Promise<void> {
     const { id, ...data } = request.body;
-    const client = await getClientById(id);
-
-    if (!client) {
-      return reply.code(404).send({ message: "Client not found" });
-    }
-
     const updated = await updateClient(id, data);
     reply.send(updated);
   }
@@ -93,15 +92,16 @@ export class ClientController {
     request: FastifyRequest<ClientIdParams>,
     reply: FastifyReply,
   ): Promise<void> {
-    const { id } = request.params;
-    const client = await getClientById(id);
-
-    if (!client) {
-      return reply.code(404).send({ message: "Client not found" });
-    }
-
-    await softDeleteClient(id);
+    await softDeleteClient(request.params.id);
     reply.send({ message: "Client deleted!" });
+  }
+
+  public static async reactivate(
+    request: FastifyRequest<ClientIdParams>,
+    reply: FastifyReply,
+  ): Promise<void> {
+    await reactivateClient(request.params.id);
+    reply.send({ message: "Client reactivated!" });
   }
 
   public static async getAthletesCount(_request: FastifyRequest, reply: FastifyReply): Promise<void> {

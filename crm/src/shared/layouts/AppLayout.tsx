@@ -1,7 +1,10 @@
 import { Outlet } from "react-router-dom";
 import { NavBar } from "../ui/NavBar";
 
-const NAV_LINKS = [{ to: "/leads", label: "Leads" }];
+const NAV_LINKS = [
+  { to: "/leads", label: "Leads" },
+  { to: "/clients", label: "Clientes" },
+];
 
 export function AppLayout() {
   return (

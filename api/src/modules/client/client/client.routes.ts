@@ -6,13 +6,16 @@ import {
   clientById,
   createClientSchema,
   updateClientSchema,
+  listClientsQuerySchema,
   clientResponseSchema,
+  paginatedClientResponseSchema,
   countResponseSchema,
   topMedalistResponseSchema,
   notFoundSchema,
   conflictSchema,
   createdClientSchema,
   deletedClientSchema,
+  reactivatedClientSchema,
 } from "./client.schema";
 
 export default async function clientRoutes(server: FastifyTypedInstance) {
@@ -37,7 +40,7 @@ export default async function clientRoutes(server: FastifyTypedInstance) {
     {
       schema: {
         tags: ["Client - Stats"],
-        description: "Top 3 athletes by total medal count, with full client data",
+        description: "Top 3 athletes by total medal count (dados públicos enxutos, sem PII)",
         response: {
           200: z.array(topMedalistResponseSchema),
         },
@@ -96,9 +99,10 @@ export default async function clientRoutes(server: FastifyTypedInstance) {
       preHandler: authenticate,
       schema: {
         tags: ["Client"],
-        description: "List all active clients with their info and active plans",
+        description: "List clients (paginated, com busca por nome/email e filtro por status do plano atual)",
+        querystring: listClientsQuerySchema,
         response: {
-          200: z.array(clientResponseSchema),
+          200: paginatedClientResponseSchema,
         },
       },
     },
@@ -129,7 +133,7 @@ export default async function clientRoutes(server: FastifyTypedInstance) {
       schema: {
         tags: ["Client"],
         description:
-          "Create a new client from lead. Creates client, plan history and client info in a single transaction.",
+          "Create a new client, either standalone or from a lead conversion. Creates client, plan history and client info in a single transaction.",
         body: createClientSchema,
         response: {
           201: createdClientSchema.describe("Client created successfully"),
@@ -173,5 +177,22 @@ export default async function clientRoutes(server: FastifyTypedInstance) {
       },
     },
     ClientController.remove,
+  );
+
+  server.patch(
+    "/clients/:id/reactivate",
+    {
+      preHandler: authenticate,
+      schema: {
+        tags: ["Client"],
+        description: "Reactivate a soft-deleted client",
+        params: clientById,
+        response: {
+          200: reactivatedClientSchema.describe("Client reactivated successfully"),
+          404: notFoundSchema,
+        },
+      },
+    },
+    ClientController.reactivate,
   );
 }
