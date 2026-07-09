@@ -24,3 +24,12 @@ export const ClientsEndpoints = {
   feedbackCreate: () => "/feedbacks",
   feedbackRemove: (feedbackId: number) => `/feedbacks/${feedbackId}`,
 };
+
+export const PlansEndpoints = {
+  list: () => "/plans",
+  byId: (id: number) => `/plan-by-id/${id}`,
+  create: () => "/plans",
+  update: () => "/update-plan",
+  remove: (id: number) => `/plans/${id}`,
+  reactivate: (id: number) => `/plans/${id}/reactivate`,
+};

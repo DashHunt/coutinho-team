@@ -1,15 +1,17 @@
-import z from "zod";
 import { FastifyTypedInstance } from "../../shared/types/fastifyTypedInstance";
 import { PlanController } from "./plan.controller";
 import { authenticate } from "../../shared/utils/authHook";
 import {
   planById,
   planResponseSchema,
+  listPlansQuerySchema,
+  paginatedPlanResponseSchema,
   createPlanSchema,
   updatePlanSchema,
   notFoundSchema,
   createdPlanSchema,
   deletedPlanSchema,
+  reactivatedPlanSchema,
 } from "./plan.schema";
 
 export default async function planRoutes(server: FastifyTypedInstance) {
@@ -19,9 +21,10 @@ export default async function planRoutes(server: FastifyTypedInstance) {
       preHandler: authenticate,
       schema: {
         tags: ["Plans"],
-        description: "List all active plans",
+        description: "List plans (paginated, com busca por nome e filtro por status)",
+        querystring: listPlansQuerySchema,
         response: {
-          200: z.array(planResponseSchema),
+          200: paginatedPlanResponseSchema,
         },
       },
     },
@@ -93,5 +96,22 @@ export default async function planRoutes(server: FastifyTypedInstance) {
       },
     },
     PlanController.remove,
+  );
+
+  server.patch(
+    "/plans/:id/reactivate",
+    {
+      preHandler: authenticate,
+      schema: {
+        tags: ["Plans"],
+        description: "Reactivate a soft-deleted plan",
+        params: planById,
+        response: {
+          200: reactivatedPlanSchema.describe("Plan reactivated successfully"),
+          404: notFoundSchema,
+        },
+      },
+    },
+    PlanController.reactivate,
   );
 }

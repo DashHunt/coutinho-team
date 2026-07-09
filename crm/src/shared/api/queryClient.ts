@@ -24,4 +24,9 @@ export const queryKeys = {
     list: (params: Record<string, unknown>) => ["clients", "list", params] as const,
     byId: (id: number) => ["clients", id] as const,
   },
+  plans: {
+    all: () => ["plans"] as const,
+    list: (params: Record<string, unknown>) => ["plans", "list", params] as const,
+    byId: (id: number) => ["plans", id] as const,
+  },
 };

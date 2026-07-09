@@ -30,6 +30,11 @@ enum PlanStatus {
   EM_RENOVACAO
 }
 
+enum PlanAvailability {
+  ATIVO
+  INATIVO
+}
+
 enum EventLevel {
   ESTADUAL
   NACIONAL
@@ -117,7 +122,7 @@ model Plans {
   duration            Int
   monthly_value       Int
   total_value         Int
-  status              String
+  status              PlanAvailability    @default(ATIVO)
   created_date        DateTime            @default(now())
   deleted_date        DateTime?
   modificated_date    DateTime            @updatedAt
