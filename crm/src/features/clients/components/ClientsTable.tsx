@@ -1,6 +1,7 @@
 import { Button } from "../../../shared/ui/Button";
 import { PlanStatusBadge } from "./PlanStatusBadge";
 import type { ClientListItem } from "../schemas/clientSchema";
+import { Table, TableActions, TableBody, TableHead, TableRow } from "../../../shared/ui/Table";
 
 type ClientsTableProps = {
   clients: ClientListItem[];
@@ -16,26 +17,26 @@ export function ClientsTable({ clients, showDeleted, onView, onDelete, onReactiv
   }
 
   return (
-    <table className="w-full text-left text-sm text-cream">
-      <thead>
-        <tr className="border-b border-bone/15 text-cream/50">
+    <Table>
+      <TableHead>
+        <TableRow>
           <th className="py-2">Nome</th>
-          <th className="py-2">E-mail</th>
-          <th className="py-2">Telefone</th>
+          <th className="hidden md:table-cell py-2">E-mail</th>
+          <th className="hidden md:table-cell py-2">Telefone</th>
           <th className="py-2">Plano atual</th>
           <th className="py-2">Conquistas</th>
           <th className="py-2">Ações</th>
-        </tr>
-      </thead>
-      <tbody>
+        </TableRow>
+      </TableHead>
+      <TableBody>
         {clients.map((client) => (
-          <tr key={client.id} className="border-b border-bone/10">
+          <TableRow key={client.id} className="text-center">
             <td className="py-2">{client.name}</td>
-            <td className="py-2">{client.email}</td>
-            <td className="py-2">{client.telephone_number}</td>
+            <td className="hidden md:table-cell py-2">{client.email}</td>
+            <td className="hidden md:table-cell py-2">{client.telephone_number}</td>
             <td className="py-2">
               {client.currentPlan ? (
-                <div className="flex items-center gap-2">
+                <div className="flex justify-center items-center gap-2">
                   <span>{client.currentPlan.plan.name}</span>
                   <PlanStatusBadge status={client.currentPlan.status} />
                 </div>
@@ -44,7 +45,7 @@ export function ClientsTable({ clients, showDeleted, onView, onDelete, onReactiv
               )}
             </td>
             <td className="py-2">{client.achievementsCount}</td>
-            <td className="flex gap-2 py-2">
+            <TableActions className="flex gap-2 py-2">
               {showDeleted ? (
                 <Button size="sm" variantTone="secondary" onClick={() => onReactivate(client)}>
                   Reativar
@@ -59,10 +60,10 @@ export function ClientsTable({ clients, showDeleted, onView, onDelete, onReactiv
                   </Button>
                 </>
               )}
-            </td>
-          </tr>
+            </TableActions>
+          </TableRow>
         ))}
-      </tbody>
-    </table>
+      </TableBody>
+    </Table>
   );
 }

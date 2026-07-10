@@ -10,6 +10,8 @@ import { ClientsTable } from "../../features/clients/components/ClientsTable";
 import { ClientFormModal } from "../../features/clients/components/ClientFormModal";
 import { DeleteClientConfirm } from "../../features/clients/components/DeleteClientConfirm";
 import type { ClientListItem, PlanStatus } from "../../features/clients/schemas/clientSchema";
+import { Container } from "../../shared/ui/Container";
+import { ContainerHeader } from "../../shared/ui/ContainerHeader";
 
 type ActiveModal = { type: "create" } | { type: "delete"; client: ClientListItem } | null;
 
@@ -34,11 +36,11 @@ export function ClientsPage() {
   const closeModal = () => setActiveModal(null);
 
   return (
-    <div className="container flex flex-col gap-4 p-6">
-      <div className="flex items-center justify-around md:justify-between">
+    <Container>
+      <ContainerHeader>
         <h1 className="text-[36px] font-semibold">Clientes</h1>
         <Button onClick={() => setActiveModal({ type: "create" })}>Novo Cliente</Button>
-      </div>
+      </ContainerHeader>
 
       <ClientsFilters
         search={search}
@@ -86,6 +88,6 @@ export function ClientsPage() {
           onConfirm={() => deleteClient.mutate(activeModal.client.id, { onSuccess: closeModal })}
         />
       )}
-    </div>
+    </Container>
   );
 }
