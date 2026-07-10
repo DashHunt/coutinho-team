@@ -9,6 +9,8 @@ import { PlansTable } from "../../features/plans/components/PlansTable";
 import { PlanFormModal } from "../../features/plans/components/PlanFormModal";
 import { DeletePlanConfirm } from "../../features/plans/components/DeletePlanConfirm";
 import type { Plan, PlanAvailability } from "../../features/plans/schemas/planSchema";
+import { Container } from "../../shared/ui/Container";
+import { ContainerHeader } from "../../shared/ui/ContainerHeader";
 
 type ActiveModal =
   | { type: "create" }
@@ -36,31 +38,29 @@ export function PlansPage() {
   const closeModal = () => setActiveModal(null);
 
   return (
-    <div className="container flex flex-col gap-4 py-4 sm:gap-6 mx-auto">
-      <div className="flex items-center justify-around md:justify-between">
-        <h1 className="text-[36px] font-semibold ml-4">Planos</h1>
+    <Container>
+      <ContainerHeader>
+        <h1 className="text-[36px] font-semibold">Planos</h1>
         <Button onClick={() => setActiveModal({ type: "create" })}>Novo Plano</Button>
-      </div>
+      </ContainerHeader>
 
-      <div className="flex justify-center items-center">
-        <PlansFilters
-          search={search}
-          onSearchChange={(value) => {
-            setSearch(value);
-            setPage(1);
-          }}
-          status={status}
-          onStatusChange={(value) => {
-            setStatus(value);
-            setPage(1);
-          }}
-          showDeleted={showDeleted}
-          onToggleDeleted={(value) => {
-            setShowDeleted(value);
-            setPage(1);
-          }}
-        />
-      </div>
+      <PlansFilters
+        search={search}
+        onSearchChange={(value) => {
+          setSearch(value);
+          setPage(1);
+        }}
+        status={status}
+        onStatusChange={(value) => {
+          setStatus(value);
+          setPage(1);
+        }}
+        showDeleted={showDeleted}
+        onToggleDeleted={(value) => {
+          setShowDeleted(value);
+          setPage(1);
+        }}
+      />
 
       {plansQuery.isLoading && <p>Carregando...</p>}
       {plansQuery.data && (
@@ -92,6 +92,6 @@ export function PlansPage() {
           onConfirm={() => deletePlan.mutate(activeModal.plan.id, { onSuccess: closeModal })}
         />
       )}
-    </div>
+    </Container>
   );
 }

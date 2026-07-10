@@ -1,8 +1,10 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
-import { Menu, X } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+import { LogOut, Menu, X } from "lucide-react";
 import { useAuthStore } from "../../features/auth/authStore";
 import { useLogout } from "../../features/auth/hooks/useLogout";
+import logo from "../../assets/badge-logo-final copy.png";
+import { Button } from "./Button";
 
 export type NavLink = {
   to: string;
@@ -17,6 +19,7 @@ export function NavBar({ links }: NavBarProps) {
   const [isOpen, setIsOpen] = useState(false);
   const user = useAuthStore((state) => state.user);
   const logout = useLogout();
+  const navigate = useNavigate();
 
   const closeMenu = () => setIsOpen(false);
 
@@ -60,25 +63,34 @@ export function NavBar({ links }: NavBarProps) {
             </Link>
           ))}
           <div className="mt-5 w-full pt-2">
-            <button
+            <Button
               type="button"
-              onClick={() => {
-                closeMenu();
-                logout.mutate();
-              }}
-              className="text-left text-sm text-cream/70 hover:text-ember"
+              variantTone="danger"
+              onClick={() => logout.mutate()}
+              className="flex justify-center text-center gap-3 w-30"
             >
-              Sair
-            </button>
+              <LogOut></LogOut> Sair
+            </Button>
           </div>
         </nav>
       )}
 
       {/* Desktop: sidebar fixa */}
       <aside className="hidden sm:flex sm:w-56 sm:shrink-0 sm:flex-col sm:border-r sm:border-bone/10 sm:bg-elevated/40 sm:px-4 sm:py-6">
-        <Link to="/" className="mb-8 text-lg font-semibold hover:text-ember">
-          Coutinho Team CRM
-        </Link>
+        <div className="flex flex-col items-center justify-center gap-1 border-b border-bone/20 pb-3 mb-3">
+          <img
+            src={logo}
+            style={{ width: 100, height: 90 }}
+            onClick={() => navigate("/")}
+            className="mb-2 hover:scale-110 hover:transition-transform duration-150 cursor-pointer"
+          />
+          <Link
+            to="/"
+            className="font-display text-[18px] tracking-tighter text-cream font-bold hover:text-ember transition-colors duration-150"
+          >
+            Coutinho Team CRM
+          </Link>
+        </div>
 
         <nav className="flex flex-col gap-1">
           {links.map((link) => (
@@ -95,19 +107,20 @@ export function NavBar({ links }: NavBarProps) {
         <div className="mt-auto flex flex-col gap-2 border-t border-bone/10 pt-4">
           {user && (
             <div className="flex flex-col gap-1">
-              <span className="text-xs text-cream/60">
-                {user.email}
-              </span>
+              <span className="text-xs text-cream/60">{user.email}</span>
               <span className="text-xs text-cream/60">({user.role})</span>
             </div>
           )}
-          <button
-            type="button"
-            onClick={() => logout.mutate()}
-            className="text-left text-sm text-cream/70 hover:text-ember"
-          >
-            Sair
-          </button>
+          <div className="flex justify-center mt-3">
+            <Button
+              type="button"
+              variantTone="danger"
+              onClick={() => logout.mutate()}
+              className="flex justify-center text-center gap-3 w-30"
+            >
+              <LogOut></LogOut> Sair
+            </Button>
+          </div>
         </div>
       </aside>
     </>

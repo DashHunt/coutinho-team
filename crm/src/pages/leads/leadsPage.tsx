@@ -10,6 +10,8 @@ import { LeadFormModal } from "../../features/leads/components/LeadFormModal";
 import { DeleteLeadConfirm } from "../../features/leads/components/DeleteLeadConfirm";
 import { ConvertToClientModal } from "../../features/leads/components/ConvertToClientModal";
 import type { Lead, LeadStatus } from "../../features/leads/schemas/leadSchema";
+import { Container } from "../../shared/ui/Container";
+import { ContainerHeader } from "../../shared/ui/ContainerHeader";
 
 type ActiveModal =
   | { type: "create" }
@@ -38,35 +40,33 @@ export function LeadsPage() {
   const closeModal = () => setActiveModal(null);
 
   return (
-    <div className="container flex flex-col gap-4 py-4 sm:gap-6 mx-auto">
-      <div className="flex items-center justify-around md:justify-between">
-        <h1 className="text-[36px] font-semibold ml-4">Leads</h1>
+    <Container>
+      <ContainerHeader>
+        <h1 className="text-[36px] font-semibold">Leads</h1>
         <Button onClick={() => setActiveModal({ type: "create" })}>Novo Lead</Button>
-      </div>
+      </ContainerHeader>
 
-      <div className="flex justify-center items-center">
-        <LeadsFilters
-          search={search}
-          onSearchChange={(value) => {
-            setSearch(value);
-            setPage(1);
-          }}
-          status={status}
-          onStatusChange={(value) => {
-            setStatus(value);
-            setPage(1);
-          }}
-          showDeleted={showDeleted}
-          onToggleDeleted={(value) => {
-            setShowDeleted(value);
-            setPage(1);
-          }}
-        />
-      </div>
+      <LeadsFilters
+        search={search}
+        onSearchChange={(value) => {
+          setSearch(value);
+          setPage(1);
+        }}
+        status={status}
+        onStatusChange={(value) => {
+          setStatus(value);
+          setPage(1);
+        }}
+        showDeleted={showDeleted}
+        onToggleDeleted={(value) => {
+          setShowDeleted(value);
+          setPage(1);
+        }}
+      />
 
       {leadsQuery.isLoading && <p>Carregando...</p>}
       {leadsQuery.data && (
-        <>
+        <div className="mt-2">
           <LeadsTable
             leads={leadsQuery.data.data}
             showDeleted={showDeleted}
@@ -80,7 +80,7 @@ export function LeadsPage() {
             totalPages={leadsQuery.data.totalPages}
             onPageChange={setPage}
           />
-        </>
+        </div>
       )}
 
       {activeModal?.type === "create" && <LeadFormModal onClose={closeModal} />}
@@ -98,6 +98,6 @@ export function LeadsPage() {
           onConfirm={() => deleteLead.mutate(activeModal.lead.id, { onSuccess: closeModal })}
         />
       )}
-    </div>
+    </Container>
   );
 }
